@@ -22,6 +22,12 @@ MODEL_PATHS = {
         "num_labels": 4,
         "adapter": False,
         "gdrive_url": "https://drive.google.com/uc?id=1RgFH1aDaNaQkVC9MKZPq511NPpomNXNH"
+    },
+    "ROBERTA_News": {
+        "path": "model/roberta_news",
+        "num_labels": 4,
+        "adapter": False,
+        "gdrive_url": "https://drive.google.com/uc?id=1k65ZZY4M0GdArxztFeKslOBF3k69e54_"
     }
 }
 
@@ -158,10 +164,10 @@ if submit and user_input:
 
 
     #  混淆矩阵单独一行
-    conf_matrix_img = load_confusion_matrix(model_name)
-    st.image(conf_matrix_img, use_column_width=True)
-    if os.path.exists(conf_matrix_img):
+    conf_matrix_img_path = f"metrics/confusion_{model_name}.png"
+    if os.path.exists(conf_matrix_img_path):
         st.markdown("**Confusion Matrix:**")
+        conf_matrix_img = load_confusion_matrix(model_name)
         st.image(conf_matrix_img, use_column_width=True)
 
     #  训练指标和分类报告并排展示
@@ -169,15 +175,17 @@ if submit and user_input:
 
     # 左列：训练指标
     with cols[0]:
-        overall_img = load_overall_performance(model_name)
-        if os.path.exists(overall_img):
+        overall_img_path = f"metrics/overall_{model_name}.png"
+        if os.path.exists(overall_img_path):
+            overall_img = load_overall_performance(model_name)
             st.markdown("**Training Performance Metrics per Epoch:**")
             st.image(overall_img, use_column_width=True)
 
     # 右列：分类报告
     with cols[1]:
-        categories_img = load_categories_performance(model_name)
-        if os.path.exists(categories_img):
+        categories_img_path = f"metrics/categories_{model_name}.png"
+        if os.path.exists(categories_img_path):
+            categories_img = load_categories_performance(model_name)
             st.markdown("**Classification Report:**")
             st.image(categories_img, use_column_width=True)
 
