@@ -165,6 +165,7 @@ if submit:
             st.warning("⚠️ Please enter text for Sentiment Analysis.")
             st.stop()
         model_key = "BERT_SentimentAnalysis" if model_selected == "BERT" else "ROBERTA_SentimentAnalysis"
+        model_name = model_key
         result_map = {0: "Negative", 1: "Positive"}
         tokenizer = tokenizers[model_key]
         model = models[model_key]
@@ -175,6 +176,7 @@ if submit:
             st.warning("⚠️ Please enter text for News Topic Categorization.")
             st.stop()
         model_key = "BERT_News" if model_selected == "BERT" else "ROBERTA_News"
+        model_name = model_key
         result_map = {0: "World", 1: "Sports", 2: "Business", 3: "Sci/Tech"}
         tokenizer = tokenizers[model_key]
         model = models[model_key]
@@ -194,6 +196,7 @@ if submit:
             st.stop()
 
         model_key = "BERT_NLI" if model_selected == "BERT" else "ROBERTA_NLI"
+        model_name = model_key
         result_map = {0: "Entailment", 1: "Contradiction", 2: "Neutral"}
         tokenizer = tokenizers[model_key]
         model = models[model_key]
