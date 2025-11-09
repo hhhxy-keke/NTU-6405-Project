@@ -1,7 +1,6 @@
-streamlit~=1.50.0
-torch==2.5.0+cpu
--f https://download.pytorch.org/whl/torch_stable.html
-sympy==1.13.1
-transformers~=4.57.1
-pillow~=11.3.0
-matplotlib~=3.9.0
+streamlit>=1.30
+torch>=2.1.0
+transformers>=4.37.0
+sympy>=1.13.1
+pillow>=10.0.0
+matplotlib>=3.8.0
