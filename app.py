@@ -194,18 +194,16 @@ if submit and user_input:
 st.markdown("---")
 
 st.markdown("""
-### Model Information
-**BERT** is trained based on *google-bert/bert-base-uncased*.  
-**ROBERTA** is trained based on *FacebookAI/roberta-base*.  
+**Model Information: **
+**BERT** is trained based on [*google-bert/bert-base-uncased*](https://huggingface.co/google-bert/bert-base-uncased).  
+**ROBERTA** is trained based on [*FacebookAI/roberta-base*](https://huggingface.co/FacebookAI/roberta-base). 
 
-### Deployment
-Deployed using **@Streamlit**.  
+**Deployed using @Streamlit**.  
 
-### Authors
-**NTU EEE 6405 Group 16:**  
+** Authors:NTU EEE 6405 Group 16:**  
 - Zeng Jiabo  
 - Fu Wanting  
-- *Hou Xinyu*  
+- Hou Xinyu 
 - Wang Di  
 - Wang Jianyu  
 - Xie Debin  
