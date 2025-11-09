@@ -194,8 +194,21 @@ if submit and user_input:
 st.markdown("---")
 
 st.markdown("""
-BERT is trained based on google-bert/bert-base-uncased.<br>
-ROBERTA is trained based on FacebookAI/roberta-base.<br>
-Deploy using @Streamlit.<br>
-Authors: NTU EEE 6405 Group 16: Zeng Jiabo, Fu Wanting, Hou Xinyu, Wang Di, Wang Jianyu, Xie Debin (Sort by first letter of surname)
+### Model Information
+**BERT** is trained based on *google-bert/bert-base-uncased*.  
+**ROBERTA** is trained based on *FacebookAI/roberta-base*.  
+
+### Deployment
+Deployed using **@Streamlit**.  
+
+### Authors
+**NTU EEE 6405 Group 16:**  
+- Zeng Jiabo  
+- Fu Wanting  
+- *Hou Xinyu*  
+- Wang Di  
+- Wang Jianyu  
+- Xie Debin  
+
+*(Sorted by first letter of surname)*  
 """, unsafe_allow_html=True)
