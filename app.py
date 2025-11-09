@@ -17,7 +17,7 @@ MODEL_PATHS = {
     "BERT_SentimentAnalysis": "model/bert_base_sentiment",
 }
 
-BASE_MODEL = "google-bert/bert-base-uncased"
+BASE_MODEL = "bert-base-uncased"
 
 # 加载模型函数（缓存，避免重复加载）
 @st.cache_resource
@@ -25,9 +25,14 @@ def load_models():
     models = {}
     tokenizers = {}
     for name, adapter_path in MODEL_PATHS.items():
-        base_model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=3)
-        model = PeftModel.from_pretrained(base_model, adapter_path)
-
+        base_model = AutoModelForSequenceClassification.from_pretrained(
+            BASE_MODEL,
+            num_labels=3
+        )
+        model = PeftModel.from_pretrained(
+            base_model,
+            adapter_path
+        )
         models[name] = model
         tokenizers[name] = AutoTokenizer.from_pretrained(BASE_MODEL)
     return models, tokenizers, MODEL_PATHS
