@@ -25,7 +25,7 @@ def load_models():
     models = {}
     tokenizers = {}
     for name, adapter_path in MODEL_PATHS.items():
-        base_model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=3)
+        base_model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=2)
         model = PeftModel.from_pretrained(base_model, adapter_path, is_trainable=False)
         model.eval()  # 推理模式
 
