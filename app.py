@@ -12,13 +12,6 @@ st.title("🤖6405 Group 16: Online Prediction Platform for BERT and its Variant
 st.write("Please select a model, enter text, and view the prediction results and the model's training performance metrics.")
 
 MODEL_PATHS = {
-    "BERT_SentimentAnalysis": {"path": "model/bert_base_sentiment", "num_labels": 2},
-    # "ROBERTA_SentimentAnalysis": {"path": "model/roberta_base_sentiment", "num_labels": 2},
-    "BERT_News": {"path": "model/bert_news", "num_labels": 4},
-    # "ROBERTA_News": {"path": "model/roberta_news", "num_labels": 4},
-}
-
-MODEL_PATHS = {
     "BERT_SentimentAnalysis": {"path": "model/bert_base_sentiment", "num_labels": 2, "adapter": True},
     "ROBERTA_SentimentAnalysis": {"path": "model/roberta_base_sentiment", "num_labels": 2, "adapter": True},
     "BERT_News": {"path": "model/bert_news", "num_labels": 4, "adapter": False},
