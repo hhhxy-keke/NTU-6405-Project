@@ -14,7 +14,7 @@ st.write("请选择一个模型，输入文本，查看预测结果和模型表�
 
 
 MODEL_PATHS = {
-    "BERT_SentimentAnalysis": "models/bert-base-sentiment",
+    "BERT_SentimentAnalysis": "model/bert_base_sentiment",
 }
 
 
