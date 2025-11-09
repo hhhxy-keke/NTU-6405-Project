@@ -69,11 +69,22 @@ def load_models():
 
     return models, tokenizers, MODEL_PATHS
 
-# 加载混淆矩阵图片（PNG）
+# 加载图片（PNG）
 def load_confusion_matrix(model_name):
     img_path = f"metrics/confusion_{model_name}.png"
     img = Image.open(img_path)
     return img
+
+def load_overall_performance(model_name):
+    img_path = f"metrics/overall_{model_name}.png"
+    img = Image.open(img_path)
+    return img
+
+def load_categories_performance(model_name):
+    img_path = f"metrics/categories_{model_name}.png"
+    img = Image.open(img_path)
+    return img
+
 
 # 加载
 models, tokenizers, model_names = load_models()
@@ -96,7 +107,9 @@ if task_selected == "Sentiment Analysis":
     # 文本输入
     user_input = st.text_area(
         "Enter text for sentiment analysis:",
-        "Please enter a sentence with emotional connotations."
+        value="",  # 初始为空
+        placeholder="Please enter a sentence with emotional connotations.",
+        key="sentiment_input"
     )
 
 elif task_selected == "News Topic Categorization":
@@ -109,7 +122,9 @@ elif task_selected == "News Topic Categorization":
     # 文本输入
     user_input = st.text_area(
         "Enter text for news topic categorization:",
-        "Please enter a sentence belonging to 'World', 'Sports', 'Business', or 'Sci/Tech'."
+        value="",
+        placeholder="Please enter a sentence belonging to 'World', 'Sports', 'Business', or 'Sci/Tech'.",
+        key="news_input"
     )
 
 # 统一预测按钮
@@ -139,20 +154,40 @@ if submit and user_input:
     st.success(f"{model_selected} Prediction: {result_map[predictions]}")
 
     # 显示混淆矩阵
-    st.subheader(f"{model_selected} Confusion Matrix")
+    st.subheader(f"{model_selected} Evaluation Results")
+
+
+    #  混淆矩阵单独一行
     conf_matrix_img = load_confusion_matrix(model_name)
     st.image(conf_matrix_img, use_column_width=True)
+    if os.path.exists(conf_matrix_img):
+        st.markdown("**Confusion Matrix:**")
+        st.image(conf_matrix_img, use_column_width=True)
 
-# # 2️⃣ 展示总体性能对比表格
-# metrics_file = "metrics/metrics.csv"
-# if os.path.exists(metrics_file):
-#     df = pd.read_csv(metrics_file)
-#     st.bar_chart(df.set_index("model")["accuracy"])
+    #  训练指标和分类报告并排展示
+    cols = st.columns(2)
+
+    # 左列：训练指标
+    with cols[0]:
+        overall_img = load_overall_performance(model_name)
+        if os.path.exists(overall_img):
+            st.markdown("**Training Performance Metrics per Epoch:**")
+            st.image(overall_img, use_column_width=True)
+
+    # 右列：分类报告
+    with cols[1]:
+        categories_img = load_categories_performance(model_name)
+        if os.path.exists(categories_img):
+            st.markdown("**Classification Report:**")
+            st.image(categories_img, use_column_width=True)
+
+
 
 st.markdown("---")
+
 st.markdown("""
-BERT is trained based on google-bert/bert-base-uncased.
-ROBERTA is trained based on FacebookAI/roberta-base.
-Deploy using @Streamlit.
+BERT is trained based on google-bert/bert-base-uncased.<br>
+ROBERTA is trained based on FacebookAI/roberta-base.<br>
+Deploy using @Streamlit.<br>
 Authors: NTU EEE 6405 Group 16: Zeng Jiabo, Fu Wanting, Hou Xinyu, Wang Di, Wang Jianyu, Xie Debin (Sort by first letter of surname)
-""")
+""", unsafe_allow_html=True)
