@@ -9,8 +9,8 @@ st.set_page_config(
     page_title="6405 Group 16 Project",
     layout="wide"
 )
-st.title("🤖 NLP 模型可视化与在线预测平台")
-st.write("请选择一个模型，输入文本，查看预测结果和模型表现指标。")
+st.title("🤖6405 Group 16: Online Prediction Platform for BERT and its Variant Models")
+st.write("Please select a model, enter text, and view the prediction results and the model's training performance metrics.")
 
 
 MODEL_PATHS = {
@@ -45,55 +45,66 @@ models, tokenizers, model_names = load_models()
 
 # 用户输入与模型选择
 with st.sidebar:  # 侧边栏放输入控件
-    st.subheader("User Inputs")
-    user_input = st.text_area("请输入文本:", "这是一个测试句子")
-    selected_model = st.selectbox("选择模型:", list(model_names.keys()))
-    submit = st.button("运行预测")
+    st.subheader("Sentiment Analysis")
+    sentiment_models = ["BERT", "ROBERTA"]
+    sentiment_model_selected = st.selectbox("Select Sentiment Model:", sentiment_models)
+    sentiment_input = st.text_area(
+        "Enter text for sentiment analysis:",
+        "Please enter a sentence with emotional connotations."
+    )
+
+    st.subheader("News Topic Categorization")
+    news_models = ["BERT", "ROBERTA"]
+    news_model_selected = st.selectbox("Select News Model:", news_models)
+    news_input = st.text_area(
+        "Enter text for news topic categorization:",
+        "Please enter a sentence belonging to 'World', 'Sports', 'Business', or 'Sci/Tech'."
+    )
+
+
+    submit = st.button("Start Predicting")
 
 
 # 模型预测与结果展示
-if submit and user_input:
-    # 获取选中的模型和分词器
-    model = models[selected_model]
-    tokenizer = tokenizers[selected_model]
+if submit:
+    # 情感分析预测
+    if sentiment_input and sentiment_model_selected:
+        model = models["BERT_SentimentAnalysis"] if sentiment_model_selected == "BERT" else models["ROBERTA_SentimentAnalysis"]
+        tokenizer = tokenizers["BERT_SentimentAnalysis"] if sentiment_model_selected == "BERT" else tokenizers["ROBERTA_SentimentAnalysis"]
 
-    # 模型推理
-    inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-        predictions = torch.argmax(outputs.logits, dim=1).item()  # 假设是分类任务
+        inputs = tokenizer(sentiment_input, return_tensors="pt", truncation=True, padding=True)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            predictions = torch.argmax(outputs.logits, dim=1).item()
 
-    # 显示结果（根据你的任务类型调整，如情感分析返回正面/负面）
-    st.subheader("预测结果")
-    result_map = {0: "负面", 1: "正面"}
-    st.success(f"模型预测: {result_map[predictions]}")
+        st.subheader("Sentiment Analysis Prediction")
+        result_map = {0: "负面", 1: "正面"}  # 根据模型标签调整
+        st.success(f"{sentiment_model_selected} 预测结果: {result_map[predictions]}")
 
-    # 显示模型性能图表（混淆矩阵等）
-    st.subheader("模型性能分析")
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.write(f"{selected_model} 混淆矩阵")
-        conf_matrix_img = load_confusion_matrix(selected_model)
+        # 混淆矩阵展示
+        st.subheader(f"{sentiment_model_selected} 情感分析混淆矩阵")
+        conf_matrix_img = load_confusion_matrix("BERT_SentimentAnalysis")  # 或 ROBERTA 的图片路径
         st.image(conf_matrix_img, use_column_width=True)
 
-    with col2:
-        st.write("模型准确率对比")
-        # 假设提前计算了各模型的准确率
-        accuracy_data = {
-            "情感分析模型": 0.89,
-            "文本分类模型": 0.85,
-            "命名实体识别": 0.92,
-            "关键词提取": 0.81,
-            "文本摘要": 0.78,
-            "机器翻译": 0.87
-        }
-        # 绘制柱状图
-        fig, ax = plt.subplots()
-        ax.bar(accuracy_data.keys(), accuracy_data.values())
-        plt.xticks(rotation=45)
-        plt.ylim(0, 1.0)
-        st.pyplot(fig)
+    # 新闻分类预测
+    if news_input and news_model_selected:
+        model = models["BERT_News"] if news_model_selected == "BERT" else models["ROBERTA_News"]
+        tokenizer = tokenizers["BERT_News"] if news_model_selected == "BERT" else tokenizers["ROBERTA_News"]
+
+        inputs = tokenizer(news_input, return_tensors="pt", truncation=True, padding=True)
+        with torch.no_grad():
+            outputs = model(**inputs)
+            predictions = torch.argmax(outputs.logits, dim=1).item()
+
+        st.subheader("News Topic Categorization Prediction")
+        topic_map = {0: "World", 1: "Sports", 2: "Business", 3: "Sci/Tech"}  # 按你的标签映射
+        st.success(f"{news_model_selected} 预测结果: {topic_map[predictions]}")
+
+        # 混淆矩阵展示
+        st.subheader(f"{news_model_selected} 新闻分类混淆矩阵")
+        conf_matrix_img = load_confusion_matrix("BERT_News")  # 或 ROBERTA 的图片路径
+        st.image(conf_matrix_img, use_column_width=True)
+
 
 # # 2️⃣ 展示总体性能对比表格
 # metrics_file = "metrics/metrics.csv"
@@ -102,4 +113,7 @@ if submit and user_input:
 #     st.bar_chart(df.set_index("model")["accuracy"])
 
 st.markdown("---")
-st.write("模型基于Colab训练，使用Streamlit部署 | 联系作者：xxx")
+st.write("BERT is trained on google-bert/bert-base-uncased.\n"
+         "ROBERTA is trained on FacebookAI/roberta-base. \n"
+         "Deploy using Streamlit \n"
+         "Authors: NTU EEE 6405 Group 16: Zeng Jiabo, Fu Wanting, Hou Xinyu, Wang Di, Wang Jianyu, Xie Debin (Sort by first letter of surname)")
