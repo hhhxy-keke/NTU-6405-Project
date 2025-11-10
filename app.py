@@ -25,6 +25,7 @@ st.markdown("""
 
 MODEL_PATHS = {
     "BERT_SentimentAnalysis": {"path": "model/bert_base_sentiment", "num_labels": 2, "adapter": True},
+    "ROBERTA_SentimentAnalysis": {"path": "model/roberta_base_sentiment", "num_labels": 2, "adapter": True},
     "BERT_News": {
         "path": "model/bert_news",
         "num_labels": 4,
