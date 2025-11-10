@@ -38,9 +38,10 @@ MODEL_PATHS = {
         "gdrive_url": "https://drive.google.com/uc?id=1k65ZZY4M0GdArxztFeKslOBF3k69e54_"
     },
     "BERT_NLI":{
-        "path": "model/NLI",
+        "path": "model/bert_nli",
         "num_labels": 3,
-        "gdrive_url": "https://drive.google.com/uc?id=1J8vuQuK_Gd36rbiQTAmpfCrwTCvUHoRk"
+        "adapter": False,
+        "gdrive_url": "https://drive.google.com/uc?id=1IoMeB3Cqg_D8C-SKGIezuOxD4eBMJexV"
     }
 }
 
