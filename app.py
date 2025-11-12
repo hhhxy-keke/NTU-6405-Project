@@ -43,6 +43,12 @@ MODEL_PATHS = {
         "num_labels": 3,
         "adapter": False,
         "gdrive_url": "https://drive.google.com/uc?id=1IoMeB3Cqg_D8C-SKGIezuOxD4eBMJexV"
+    },
+    "ROBERTA_NLI": {
+        "path": "model/roberta_nli",
+        "num_labels": 3,
+        "adapter": False,
+        "gdrive_url": "https://drive.google.com/uc?id=1gyP1I1cf2ztaT21L0YbeHeiVuIgzdOsK"
     }
 }
 
