@@ -7,22 +7,116 @@ import os
 import gdown
 import zipfile
 
-
+# ===================== 基本页面配置 =====================
 st.set_page_config(
     page_title="6405 Group 16 Project",
+    page_icon="🤖",
     layout="wide"
 )
-st.title("🤖 6405 Group 16: Online Prediction Platform for BERT and its Variant Models")
 
-st.image("assets/pingu1.jpg", width=150)
-
-
+# ===================== 全局样式美化（CSS） =====================
 st.markdown("""
-### Hi! Welcome to Group 16's EE6405 Project!
-> ⚡ **Please select a scene in the sidebar, and then select a model.**  
-> **Let's enter text, view the prediction results and the model's training performance metrics!**
+<style>
+/* 整体背景 & 字体 */
+.stApp {
+    background: radial-gradient(circle at top left, #f5f7ff 0, #ffffff 40%, #fdf2ff 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* 让主区域稍微窄一点，更像 dashboard */
+.block-container {
+    padding-top: 1.3rem;
+    padding-bottom: 2rem;
+}
+
+/* 主标题 & 副标题 */
+.main-title {
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+.subtitle {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* 通用卡片 */
+.nice-card {
+    padding: 1.1rem 1.3rem;
+    border-radius: 0.9rem;
+    border: 1px solid #e5e5ef;
+    background-color: rgba(255,255,255,0.96);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.10);
+    margin-bottom: 1.2rem;
+}
+
+/* 结果 badge */
+.result-badge {
+    display: inline-block;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    background-color: #e5f4ff;
+    color: #0050b3;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+}
+
+/* 置信度文本 */
+.confidence {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* sidebar 说明文字样式 */
+.sidebar-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-top: 0.4rem;
+}
+.sidebar-hint {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* 小号分割线 */
+.soft-divider {
+    margin: 0.8rem 0 0.6rem 0;
+    border-top: 1px dashed #ddd;
+}
+</style>
 """, unsafe_allow_html=True)
 
+# ===================== 顶部封面区域 =====================
+header_col_logo, header_col_text = st.columns([1, 5])
+
+with header_col_logo:
+    st.image("assets/pingu1.jpg", width=135)
+
+with header_col_text:
+    st.markdown(
+        '<div class="main-title">🤖 6405 Group 16 · Online Prediction Platform</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        '<div class="subtitle">BERT & RoBERTa · Sentiment Analysis · News Topic Classification · Natural Language Inference</div>',
+        unsafe_allow_html=True
+    )
+
+# 使用卡片包一层“使用说明”
+st.markdown("""
+<div class="nice-card">
+    <b>How to use:</b>
+    <ol style="margin-top: 0.4rem; padding-left: 1.1rem;">
+        <li>Use the <b>left sidebar</b> to choose a <b>task</b> and <b>model</b>.</li>
+        <li>Enter your text (or <i>Premise + Hypothesis</i> for NLI).</li>
+        <li>Click <b>Start Prediction</b> to see the result and training metrics.</li>
+    </ol>
+</div>
+""", unsafe_allow_html=True)
+
+# ===================== 模型路径与配置 =====================
 MODEL_PATHS = {
     "BERT_SentimentAnalysis": {"path": "model/bert_base_sentiment", "num_labels": 2, "adapter": True},
     "ROBERTA_SentimentAnalysis": {"path": "model/roberta_base_sentiment", "num_labels": 2, "adapter": True},
@@ -38,7 +132,7 @@ MODEL_PATHS = {
         "adapter": False,
         "gdrive_url": "https://drive.google.com/uc?id=1k65ZZY4M0GdArxztFeKslOBF3k69e54_"
     },
-    "BERT_NLI":{
+    "BERT_NLI": {
         "path": "model/bert_nli",
         "num_labels": 3,
         "adapter": False,
@@ -52,6 +146,7 @@ MODEL_PATHS = {
     }
 }
 
+# ===================== 模型加载（缓存） =====================
 @st.cache_resource
 def load_models():
     models = {}
@@ -84,11 +179,11 @@ def load_models():
             num_labels=num_labels
         )
 
-        # 大家用的方法似乎不太一样，等大家都补上自己的再看看需不需要重构了，这里先保证能跑就行~~QAQ~~ (BY XIE DEBIN
+        # 特殊：BERT_NLI 的存储方式不一样
         if path == "model/bert_nli":
-            path = os.path.join(path, "bert_nli")
-            models[name] = AutoModelForSequenceClassification.from_pretrained(path)
-            tokenizers[name] = AutoTokenizer.from_pretrained(path)
+            specific_path = os.path.join(path, "bert_nli")
+            models[name] = AutoModelForSequenceClassification.from_pretrained(specific_path)
+            tokenizers[name] = AutoTokenizer.from_pretrained(specific_path)
             continue
 
         # 如果是 adapter 模型
@@ -103,7 +198,7 @@ def load_models():
 
     return models, tokenizers, MODEL_PATHS
 
-# 加载图片（PNG）
+# ===================== 图片加载函数 =====================
 def load_confusion_matrix(model_name):
     img_path = f"metrics/confusion_{model_name}.png"
     img = Image.open(img_path)
@@ -119,41 +214,47 @@ def load_categories_performance(model_name):
     img = Image.open(img_path)
     return img
 
+# ===================== 加载所有模型（只执行一次） =====================
+# models, tokenizers, model_names = load_models()
 
-# 加载
-models, tokenizers, model_names = load_models()
+# ===================== Sidebar：任务 & 模型选择 =====================
+st.sidebar.markdown("### ⚙️ Task & Model")
 
-# 用户输入与模型选择
-st.sidebar.subheader("Task Selection")
 task_selected = st.sidebar.radio(
     "Choose a task:",
     ["Sentiment Analysis", "News Topic Categorization", "Natural Language Inference(NLI)"]
 )
 
-# 根据任务显示对应的模型选择和输入框
+st.sidebar.markdown('<div class="soft-divider"></div>', unsafe_allow_html=True)
+st.sidebar.markdown(
+    '<p class="sidebar-title">🚶 Quick Steps</p>'
+    '<ol class="sidebar-hint" style="padding-left:1.1rem;">'
+    '<li>Select a task</li>'
+    '<li>Select a model</li>'
+    '<li>Enter text</li>'
+    '<li>Click <b>Start Prediction</b></li>'
+    '</ol>',
+    unsafe_allow_html=True
+)
+
+# ===================== 主体：根据任务显示输入区域 =====================
+model_options = ["BERT", "ROBERTA"]
+
 if task_selected == "Sentiment Analysis":
-    st.subheader("Sentiment Analysis")
+    st.subheader("🧠 Sentiment Analysis")
 
-    # 模型选择
-    model_options = ["BERT", "ROBERTA"]
     model_selected = st.selectbox("Select Model:", model_options)
-
-    # 文本输入
     user_input = st.text_area(
         "Enter text for sentiment analysis:",
-        value="",  # 初始为空
+        value="",
         placeholder="Please enter a sentence with emotional connotations.",
         key="sentiment_input"
     )
 
 elif task_selected == "News Topic Categorization":
-    st.subheader("News Topic Categorization")
+    st.subheader("📰 News Topic Categorization")
 
-    # 模型选择
-    model_options = ["BERT", "ROBERTA"]
     model_selected = st.selectbox("Select Model:", model_options)
-
-    # 文本输入
     user_input = st.text_area(
         "Enter text for news topic categorization:",
         value="",
@@ -162,20 +263,15 @@ elif task_selected == "News Topic Categorization":
     )
 
 elif task_selected == "Natural Language Inference(NLI)":
-    st.subheader("Natural Language Inference (NLI)")
+    st.subheader("🔗 Natural Language Inference (NLI)")
 
-    # 模型选择
-    model_options = ["BERT", "ROBERTA"]
     model_selected = st.selectbox("Select Model:", model_options)
-
-    # NLI 任务需要两个输入句子
     premise = st.text_area(
         "Premise:",
         value="",
         placeholder="Enter the first sentence (Premise)",
         key="premise_input"
     )
-
     hypothesis = st.text_area(
         "Hypothesis:",
         value="",
@@ -183,8 +279,8 @@ elif task_selected == "Natural Language Inference(NLI)":
         key="hypothesis_input"
     )
 
-# 统一预测按钮
-submit = st.button("Start Prediction")
+# ===================== 统一预测按钮 =====================
+submit = st.button("🚀 Start Prediction")
 
 if submit:
     # 先根据任务准备 model_key、tokenizer、model、inputs、result_map
@@ -211,12 +307,11 @@ if submit:
         inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True)
 
     elif task_selected == "Natural Language Inference(NLI)":
-        # NLI uses premise + hypothesis
         try:
-            premise  # ensure variable exists in namespace
+            premise
             hypothesis
         except NameError:
-            st.warning("⚠️ Please provide both premise and hypothesis for NLI.")
+            st.warning("⚠️ Please provide both Premise and Hypothesis for NLI.")
             st.stop()
 
         if not premise or not hypothesis:
@@ -234,75 +329,94 @@ if submit:
         st.warning("⚠️ Unknown task selected.")
         st.stop()
 
-    # 推理（确保 model 和 inputs 都已定义）
+    # ===================== 推理 =====================
     model.eval()
     with torch.no_grad():
         outputs = model(**inputs)
-        predictions = torch.argmax(outputs.logits, dim=1).item()
+        logits = outputs.logits
+        predictions = torch.argmax(logits, dim=1).item()
+        probs = torch.softmax(logits, dim=1)[0].cpu().tolist()
+        confidence = probs[predictions] * 100
 
-    # 展示结果
-    st.subheader("Prediction Result")
-    st.success(f"**{model_selected} Prediction:** {result_map[predictions]}")
+    label_text = result_map[predictions]
 
-  #-----------------------------------------------------------------------------------
+    # ===================== 预测结果显示（卡片） =====================
+    st.markdown("### 🔍 Prediction Result")
+    st.markdown(
+        f"""
+        <div class="nice-card">
+            <div class="result-badge">{task_selected}</div>
+            <div style="font-size:1.05rem; margin-top:0.15rem;">
+                <b>{model_selected}</b> predicts:
+                <span style="color:#111; font-weight:700;">{label_text}</span>
+            </div>
+            <div class="confidence">
+                Confidence: <b>{confidence:.1f}%</b>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    # 显示混淆矩阵
-    st.subheader(f"{model_selected} Evaluation Results")
+    # ===================== 评估结果（Tabs） =====================
+    st.markdown("### 📈 Training & Evaluation")
 
-    #  混淆矩阵单独一行
-    conf_matrix_img_path = f"metrics/confusion_{model_name}.png"
-    if os.path.exists(conf_matrix_img_path):
-        st.markdown("**Confusion Matrix:**")
-        conf_matrix_img = load_confusion_matrix(model_name)
-        st.image(conf_matrix_img, width = 450)
+    tab1, tab2, tab3 = st.tabs(["Confusion Matrix", "Metrics per Epoch", "Classification Report"])
 
-    #  训练指标和分类报告并排展示
-    cols = st.columns(2)
+    # Tab 1: 混淆矩阵
+    with tab1:
+        conf_matrix_img_path = f"metrics/confusion_{model_name}.png"
+        if os.path.exists(conf_matrix_img_path):
+            st.markdown("**Confusion Matrix**")
+            conf_matrix_img = load_confusion_matrix(model_name)
+            st.image(conf_matrix_img, width=450)
+        else:
+            st.info("No confusion matrix image found for this model.")
 
-    # 左列：训练指标
-    with cols[0]:
+    # Tab 2: 训练指标
+    with tab2:
         overall_img_path = f"metrics/overall_{model_name}.png"
         if os.path.exists(overall_img_path):
+            st.markdown("**Training Performance Metrics per Epoch**")
             overall_img = load_overall_performance(model_name)
-            st.markdown("**Training Performance Metrics per Epoch:**")
             st.image(overall_img, use_container_width=True)
+        else:
+            st.info("No overall performance image found for this model.")
 
-    # 右列：分类报告
-    with cols[1]:
+    # Tab 3: 分类报告
+    with tab3:
         categories_img_path = f"metrics/categories_{model_name}.png"
         if os.path.exists(categories_img_path):
+            st.markdown("**Classification Report**")
             categories_img = load_categories_performance(model_name)
-            st.markdown("**Classification Report:**")
             st.image(categories_img, use_container_width=True)
         else:
-            print("Not Find")
+            st.info("No classification report image found for this model.")
 
-
-
+# ===================== 底部说明 =====================
 st.markdown("---")
 
 st.markdown("""
-**Model Information:**
+**Model Information**
 
-**BERT** is trained based on [*google-bert/bert-base-uncased*](https://huggingface.co/google-bert/bert-base-uncased).  
-**ROBERTA** is trained based on [*FacebookAI/roberta-base*](https://huggingface.co/FacebookAI/roberta-base). 
+- **BERT** is trained based on *google-bert/bert-base-uncased*.  
+- **RoBERTa** is trained based on *FacebookAI/roberta-base*.  
 
-**Deployed using @Streamlit**.  
+Deployed using **Streamlit**.  
 
 **Authors: NTU EEE 6405 Group 16**  
 - Zeng Jiabo  
 - Fu Wanting  
-- Hou Xinyu 
+- Hou Xinyu  
 - Wang Di  
 - Wang Jianyu  
 - Xie Debin  
 
 *(Sorted by first letter of surname)*  
-""", unsafe_allow_html=True)
+""")
 
-
-col1, col2 = st.columns([1, 5])  # 两列宽度相等
+col1, col2 = st.columns([1, 5])
 with col1:
     st.image("assets/pingu6.jpg", width=150)
 with col2:
-    st.write("Thank you for using~")
+    st.write("Thank you for using~ 🎉")
