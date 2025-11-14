@@ -25,7 +25,7 @@ st.markdown("""
 
 /* 让主区域稍微窄一点，更像 dashboard */
 .block-container {
-    padding-top: 1.3rem;
+    padding-top: 5.2rem;
     padding-bottom: 2rem;
 }
 
@@ -215,7 +215,7 @@ def load_categories_performance(model_name):
     return img
 
 # ===================== 加载所有模型（只执行一次） =====================
-# models, tokenizers, model_names = load_models()
+models, tokenizers, model_names = load_models()
 
 # ===================== Sidebar：任务 & 模型选择 =====================
 st.sidebar.markdown("### ⚙️ Task & Model")
