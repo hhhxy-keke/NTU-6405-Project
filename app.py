@@ -25,7 +25,7 @@ st.markdown("""
 
 /* 让主区域稍微窄一点，更像 dashboard */
 .block-container {
-    padding-top: 5.2rem;
+    padding-top: 4.2rem;
     padding-bottom: 2rem;
 }
 
